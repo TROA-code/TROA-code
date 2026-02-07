@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>La Maison des Sons [ON] - Activité</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Patrick+Hand&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,400,1,0" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+<style>
+    /* Global Styles */
+    body {
+      font-family: 'Comic Neue', cursive;
+      background-color: #f0f9ff;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    /* Hand-drawn font for educational feel */
+    .font-school {
+      font-family: 'Patrick Hand', cursive;
+    }
+
+    /* House Roof Shape (CSS Triangle) */
+    .roof-container {
+      clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+      background: white;
+    }
+
+    /* Grid Styling */
+    .grid-cell {
+      border-right: 2px dashed #9ca3af;
+      border-bottom: 2px dashed #9ca3af;
+      transition: background-color 0.2s ease;
+    }
+    .grid-cell:nth-child(4n) { border-right: none; }
+    .grid-cell:nth-last-child(-n+4) { border-bottom: none; }
+
+    /* Drag & Drop Feedback */
+    .drag-over-zone {
+      background-color: #dcfce7 !important; /* green-100 */
+      box-shadow: inset 0 0 0 4px #22c55e;
+    }
+
+    /* Animations */
+    @keyframes popIn {
+      0% { transform: scale(0); opacity: 0; }
+      80% { transform: scale(1.1); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .animate-pop {
+      animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-8px); }
+      40% { transform: translateX(8px); }
+      60% { transform: translateX(-4px); }
+      80% { transform: translateX(4px); }
+    }
+    .animate-shake {
+      animation: shake 0.5s ease-in-out;
+      background-color: #fee2e2;
+      border-color: #ef4444;
+    }
+
+    /* Custom Scrollbar */
+    .custom-scroll::-webkit-scrollbar { width: 8px; }
+    .custom-scroll::-webkit-scrollbar-track { background: #fff7ed; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: #fdba74; border-radius: 4px; }
+
+    /* Print Styles */
+    @media print {
+      @page {
+        size: landscape;
+        margin: 1cm;
+      }
+      body {
+        background: white;
+        height: auto;
+        overflow: visible;
+      }
+      /* Hide UI controls */
+      #game-header, #bank-panel, #bravo-overlay, #error-toast, .no-print {
+        display: none !important;
+      }
+      /* Expand House Area */
+      #main-layout {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+      #house-section {
+        width: 100%;
+        height: auto;
+        page-break-inside: avoid;
+      }
+      #print-header {
+        display: block !important;
+        text-align: center;
+        margin-bottom: 20px;
+        font-family: 'Patrick Hand', cursive;
+        font-size: 24px;
+        border-bottom: 2px solid #333;
+        padding-bottom: 10px;
+      }
+      /* Remove shadows for cleaner print */
+      .shadow-2xl, .shadow-xl, .drop-shadow-md {
+        box-shadow: none !important;
+        filter: none !important;
+      }
+      /* Ensure colors print */
+      .grid-cell {
+        border-color: #000;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+    }
+  </style>
+</head>
+<body class="h-screen w-screen flex flex-col overflow-hidden">
+<div class="hidden" id="print-header">
+<div class="flex justify-between items-center w-full px-10">
+<span>Nom : __________________________</span>
+<span>Date : __________________________</span>
+</div>
+</div>
+<header class="bg-white shadow-md z-30 px-6 py-3 flex justify-between items-center shrink-0" id="game-header">
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-rounded text-green-600 text-4xl">home_app_logo</span>
+<h1 class="text-2xl md:text-3xl font-bold text-gray-800">La Maison des Sons [ON]</h1>
+</div>
+<div class="hidden md:flex bg-blue-50 px-4 py-2 rounded-xl text-sm text-blue-700 font-medium border border-blue-100">
+<span class="material-symbols-rounded text-base mr-2">info</span>
+        Glisse les images dans la maison pour gagner !
+      </div>
+</div>
+<div class="flex items-center gap-3">
+<div class="bg-yellow-100 text-yellow-800 px-4 py-2 rounded-full font-bold shadow-sm flex items-center gap-2 border border-yellow-200">
+<span class="material-symbols-rounded text-yellow-600">star</span>
+<span id="score-display">0 / 16</span>
+</div>
+<button class="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 flex items-center justify-center transition-colors border border-gray-300" onclick="toggleAudio()">
+<span class="material-symbols-rounded" id="audio-icon">volume_up</span>
+</button>
+</div>
+</header>
+<div class="flex-1 flex flex-col md:flex-row px-4 pb-4 pt-8 gap-6 overflow-hidden max-w-7xl mx-auto w-full relative z-0" id="main-layout">
+<section class="flex-1 flex flex-col relative h-full min-h-0" id="house-section">
+<div class="h-32 md:h-40 relative z-10 w-full flex justify-center filter drop-shadow-xl">
+<div class="absolute inset-0 roof-container border-b-4 border-gray-800"></div>
+<svg class="absolute inset-0 w-full h-full pointer-events-none z-10" preserveAspectRatio="none" viewBox="0 0 100 100">
+<line stroke="#1f2937" stroke-width="0.8" x1="0" x2="50" y1="100" y2="0"></line>
+<line stroke="#1f2937" stroke-width="0.8" x1="100" x2="50" y1="100" y2="0"></line>
+</svg>
+<div class="absolute inset-0 flex items-end justify-center pb-2 gap-8 md:gap-16 z-20">
+<div class="flex flex-col items-center group cursor-pointer" onclick="speak('Le pont')">
+<img alt="Pont" class="w-16 h-16 md:w-20 md:h-20 object-contain drop-shadow-sm transition-transform group-hover:scale-110" src="images/pont.png"/>
+<span class="font-school text-xs text-gray-400 mt-1">Pont</span>
+</div>
+<div class="flex flex-col items-center mb-4">
+<div class="text-7xl font-black text-gray-800 tracking-widest leading-none">on</div>
+<div class="flex gap-4 text-2xl text-gray-400 font-bold opacity-60">
+<span>om</span>
+<span>on</span>
+</div>
+</div>
+<div class="flex flex-col items-center group cursor-pointer" onclick="speak('Le garçon fait le son on')">
+<img alt="Geste" class="w-16 h-16 md:w-20 md:h-20 object-contain drop-shadow-sm transition-transform group-hover:scale-110" src="images/geste.png"/>
+<span class="font-school text-xs text-gray-400 mt-1">Geste</span>
+</div>
+</div>
+</div>
+<div class="flex-1 bg-white border-x-4 border-b-4 border-gray-800 grid grid-cols-4 grid-rows-4 shadow-2xl relative" id="house-grid">
+</div>
+</section>
+<aside class="w-full md:w-80 lg:w-96 flex flex-col bg-orange-50 rounded-2xl shadow-xl border-4 border-orange-200 overflow-hidden shrink-0 h-48 md:h-auto transition-all" id="bank-panel">
+<div class="p-3 bg-orange-100 border-b border-orange-200 flex justify-between items-center">
+<h2 class="font-bold text-orange-900 flex items-center gap-2">
+<span class="material-symbols-rounded">category</span>
+          Banque d'images
+        </h2>
+<span class="text-xs font-bold text-orange-700 bg-orange-200 px-2 py-1 rounded-full" id="items-counter">-- restantes</span>
+</div>
+<div class="flex-1 overflow-y-auto p-3 custom-scroll bg-orange-50/50">
+<div class="grid grid-cols-3 md:grid-cols-2 gap-3 pb-8" id="item-bank">
+</div>
+</div>
+</aside>
+</div>
+<div class="fixed inset-0 pointer-events-none z-50 flex items-center justify-center hidden" id="bravo-overlay">
+<div class="bg-white/95 backdrop-blur-sm border-8 border-green-500 p-8 rounded-[3rem] shadow-2xl flex flex-col items-center animate-pop transform -rotate-2">
+<h2 class="text-8xl font-black text-transparent bg-clip-text bg-gradient-to-br from-green-500 to-emerald-700 drop-shadow-sm mb-2">BRAVO !</h2>
+<div class="bg-green-50 p-4 rounded-2xl border border-green-100 flex flex-col items-center">
+<img class="w-32 h-32 object-contain mb-2 drop-shadow-md" id="bravo-img" src=""/>
+<span class="text-4xl font-school font-bold text-gray-800" id="bravo-word">Mot</span>
+</div>
+<div class="mt-4 text-5xl">🎉 ✨</div>
+</div>
+</div>
+<div class="fixed top-24 left-1/2 -translate-x-1/2 pointer-events-none z-50 transition-all duration-300 opacity-0 transform -translate-y-4" id="error-toast">
+<div class="bg-red-500 text-white px-8 py-4 rounded-full shadow-2xl flex items-center gap-3 font-bold text-xl border-2 border-white">
+<span class="material-symbols-rounded text-3xl">cancel</span>
+<span>Ce mot n'a pas le son [ON] !</span>
+</div>
+</div>
+<script>
+    // --- Data Configuration ---
+    const itemsData = [
+      { id: 'trompette', word: 'trompette', correct: true, src: 'images/trompette.png' },
+      { id: 'maison', word: 'maison', correct: true, src: 'images/maison.png' },
+      { id: 'ombre', word: 'ombre', correct: true, src: 'images/ombre.png' },
+      { id: 'eponge', word: 'éponge', correct: true, src: 'images/eponge.png' },
+      { id: 'ballon', word: 'ballon', correct: true, src: 'images/ballon.png' },
+      { id: 'dindon', word: 'dindon', correct: true, src: 'images/dindon.png' },
+      { id: 'poison', word: 'poison', correct: true, src: 'images/poison.png' },
+      { id: 'blouson', word: 'blouson', correct: true, src: 'images/blouson.png' },
+      { id: 'pantalon', word: 'pantalon', correct: true, src: 'images/pantalon.png' },
+      { id: 'camion', word: 'camion', correct: true, src: 'images/camion.png' },
+      { id: 'violon', word: 'violon', correct: true, src: 'images/violon.png' },
+      { id: 'papillon', word: 'papillon', correct: true, src: 'images/papillon.png' },
+      { id: 'herisson', word: 'hérisson', correct: true, src: 'images/herisson.png' },
+      { id: 'avion', word: 'avion', correct: true, src: 'images/avion.png' },
+      { id: 'jonquille', word: 'jonquille', correct: true, src: 'images/jonquille.png' },
+      { id: 'pigeon', word: 'pigeon', correct: true, src: 'images/pigeon.png' },
+      
+      // Distractors (Incorrect)
+      { id: 'kangourou', word: 'kangourou', correct: false, src: 'images/kangourou.png' },
+      { id: 'banc', word: 'banc', correct: false, src: 'images/banc.png' },
+      { id: 'poussette', word: 'poussette', correct: false, src: 'images/poussette.png' },
+      { id: 'parapluie', word: 'parapluie', correct: false, src: 'images/parapluie.png' }
+    ];
+
+    let audioEnabled = true;
+    let score = 0;
+    const synth = window.speechSynthesis;
+
+    // --- Init ---
+    document.addEventListener('DOMContentLoaded', () => {
+      initializeGame();
+      setupTone();
+    });
+
+    async function setupTone() {
+      await Tone.start();
+    }
+
+    function initializeGame() {
+      score = 0;
+      updateScoreUI();
+      renderGrid();
+      renderBank();
+    }
+
+    function renderGrid() {
+      const grid = document.getElementById('house-grid');
+      grid.innerHTML = '';
+      for (let i = 0; i < 16; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'grid-cell w-full h-full flex items-center justify-center relative';
+        cell.dataset.index = i;
+        
+        // Drag Events
+        cell.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          if (!cell.hasChildNodes()) {
+            cell.classList.add('drag-over-zone');
+            e.dataTransfer.dropEffect = 'move';
+          }
+        });
+        
+        cell.addEventListener('dragleave', () => {
+          cell.classList.remove('drag-over-zone');
+        });
+
+        cell.addEventListener('drop', handleDrop);
+        grid.appendChild(cell);
+      }
+    }
+
+    function renderBank() {
+      const bank = document.getElementById('item-bank');
+      bank.innerHTML = '';
+      
+      // Randomize order
+      const shuffled = [...itemsData].sort(() => 0.5 - Math.random());
+      
+      shuffled.forEach(item => {
+        const card = createCard(item);
+        bank.appendChild(card);
+      });
+      updateCounter();
+    }
+
+    function createCard(item) {
+      const card = document.createElement('div');
+      card.id = `card-${item.id}`;
+      card.className = 'bg-white rounded-xl p-2 shadow-sm border border-gray-200 flex flex-col items-center cursor-grab active:cursor-grabbing hover:shadow-lg transition-all select-none relative group transform hover:-translate-y-1';
+      card.draggable = true;
+      
+      // Drag Logic
+      card.addEventListener('dragstart', (e) => {
+        e.dataTransfer.setData('application/json', JSON.stringify(item));
+        card.style.opacity = '0.5';
+        if(Tone.context.state !== 'running') Tone.start();
+      });
+      
+      card.addEventListener('dragend', () => {
+        card.style.opacity = '1';
+      });
+
+      // Sound Button
+      const soundBtn = document.createElement('button');
+      soundBtn.className = 'absolute top-1 right-1 w-8 h-8 flex items-center justify-center bg-blue-100 text-blue-600 rounded-full hover:bg-blue-200 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity';
+      soundBtn.innerHTML = '<span class="material-symbols-rounded text-lg">volume_up</span>';
+      soundBtn.onclick = (e) => {
+        e.stopPropagation();
+        speak(item.word);
+      };
+
+      // Image with Error Handler
+      const img = document.createElement('img');
+      img.src = item.src;
+      img.alt = item.word;
+      img.className = 'w-16 h-16 md:w-20 md:h-20 object-contain pointer-events-none mb-2';
+      
+      // SI L'IMAGE EST INTROUVABLE, ON AFFICHE UN PLACEHOLDER "ERREUR"
+      img.onerror = function() {
+        this.src = 'https://placehold.co/100/red/white?text=Nom?';
+        this.title = "Vérifie le nom du fichier dans le dossier images !";
+      };
+
+      // Label
+      const label = document.createElement('span');
+      label.textContent = item.word;
+      label.className = 'font-school text-lg font-bold text-gray-700 leading-none';
+
+      card.appendChild(soundBtn);
+      card.appendChild(img);
+      card.appendChild(label);
+      
+      return card;
+    }
+
+    // --- Logic ---
+    function handleDrop(e) {
+      e.preventDefault();
+      const cell = e.target.closest('.grid-cell');
+      cell.classList.remove('drag-over-zone');
+
+      if (cell.hasChildNodes()) return;
+
+      const data = e.dataTransfer.getData('application/json');
+      if (!data) return;
+      
+      const item = JSON.parse(data);
+      const originalCard = document.getElementById(`card-${item.id}`);
+
+      if (item.correct) {
+        handleSuccess(cell, item, originalCard);
+      } else {
+        handleError(originalCard);
+      }
+    }
+
+    function handleSuccess(cell, item, originalCard) {
+      // Audio
+      playSuccessSound();
+      speak(item.word);
+
+      // UI Update
+      if (originalCard) originalCard.remove();
+      updateCounter();
+
+      // Populate Cell
+      const content = document.createElement('div');
+      content.className = 'w-full h-full flex flex-col items-center justify-center animate-pop p-1';
+      
+      const img = document.createElement('img');
+      img.src = item.src;
+      img.className = 'w-3/4 h-3/4 object-contain drop-shadow-sm';
+      // Error handling for dropped image too
+      img.onerror = function() {
+        this.src = 'https://placehold.co/100/red/white?text=Nom?';
+      };
+      
+      const text = document.createElement('span');
+      text.textContent = item.word;
+      text.className = 'font-school text-sm md:text-base font-bold text-gray-800 mt-1';
+      
+      content.appendChild(img);
+      content.appendChild(text);
+      cell.appendChild(content);
+
+      // Score
+      score++;
+      updateScoreUI();
+
+      // Feedback
+      spawnConfetti(cell);
+      showBravo(item);
+
+      if (score === 16) {
+        setTimeout(() => speak("Félicitations ! La maison est complète !"), 2000);
+      }
+    }
+
+    function handleError(card) {
+      playErrorSound();
+      speak("Essaie encore");
+      
+      // Toast
+      const toast = document.getElementById('error-toast');
+      toast.style.opacity = '1';
+      toast.style.transform = 'translate(-50%, 0)';
+      
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translate(-50%, -1rem)';
+      }, 1500);
+
+      // Card Shake
+      if (card) {
+        card.classList.remove('animate-shake');
+        void card.offsetWidth;
+        card.classList.add('animate-shake');
+      }
+    }
+
+    // --- Helpers ---
+    function updateCounter() {
+      const count = document.getElementById('item-bank').children.length;
+      document.getElementById('items-counter').textContent = `${count} restantes`;
+    }
+
+    function updateScoreUI() {
+      document.getElementById('score-display').textContent = `${score} / 16`;
+    }
+
+    function showBravo(item) {
+      const overlay = document.getElementById('bravo-overlay');
+      const img = document.getElementById('bravo-img');
+      const text = document.getElementById('bravo-word');
+      
+      img.src = item.src;
+      text.textContent = item.word;
+      
+      overlay.classList.remove('hidden');
+      setTimeout(() => overlay.classList.add('hidden'), 1500);
+    }
+
+    function spawnConfetti(element) {
+      const rect = element.getBoundingClientRect();
+      const x = rect.left + rect.width / 2;
+      const y = rect.top + rect.height / 2;
+      const colors = ['#f472b6', '#4ade80', '#60a5fa', '#facc15'];
+
+      for (let i = 0; i < 25; i++) {
+        const p = document.createElement('div');
+        p.className = 'fixed w-3 h-3 rounded-full z-50 pointer-events-none';
+        p.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        p.style.left = x + 'px';
+        p.style.top = y + 'px';
+        document.body.appendChild(p);
+
+        const angle = Math.random() * Math.PI * 2;
+        const vel = 60 + Math.random() * 80;
+        const tx = Math.cos(angle) * vel;
+        const ty = Math.sin(angle) * vel;
+
+        p.animate([
+          { transform: 'translate(0,0) scale(1)', opacity: 1 },
+          { transform: `translate(${tx}px, ${ty}px) scale(0)`, opacity: 0 }
+        ], { duration: 800, easing: 'ease-out' }).onfinish = () => p.remove();
+      }
+    }
+
+    // --- Audio ---
+    function toggleAudio() {
+      audioEnabled = !audioEnabled;
+      document.getElementById('audio-icon').textContent = audioEnabled ? 'volume_up' : 'volume_off';
+    }
+
+    function speak(text) {
+      if (!audioEnabled || !synth) return;
+      synth.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'fr-FR';
+      u.rate = 0.9;
+      synth.speak(u);
+    }
+
+    function playSuccessSound() {
+      if (!audioEnabled) return;
+      const poly = new Tone.PolySynth().toDestination();
+      poly.volume.value = -8;
+      poly.triggerAttackRelease(["C5", "E5", "G5"], "8n");
+    }
+
+    function playErrorSound() {
+      if (!audioEnabled) return;
+      const synthErr = new Tone.Synth().toDestination();
+      synthErr.volume.value = -5;
+      synthErr.triggerAttackRelease("A2", "8n");
+    }
+
+  </script>
+</body>
+</html>
