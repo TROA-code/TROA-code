@@ -1,14 +1,17 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport">
-<title>La Maison des Sons [ON] - Activité</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Patrick+Hand&display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,400,1,0" rel="stylesheet"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
-<style>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>La Maison des Sons [ON] - Activité</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Patrick+Hand&display=swap"
+    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,400,1,0"
+    rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+  <style>
     /* Global Styles */
     body {
       font-family: 'Comic Neue', cursive;
@@ -34,32 +37,68 @@
       border-bottom: 2px dashed #9ca3af;
       transition: background-color 0.2s ease;
     }
-    .grid-cell:nth-child(4n) { border-right: none; }
-    .grid-cell:nth-last-child(-n+4) { border-bottom: none; }
+
+    .grid-cell:nth-child(4n) {
+      border-right: none;
+    }
+
+    .grid-cell:nth-last-child(-n+4) {
+      border-bottom: none;
+    }
 
     /* Drag & Drop Feedback */
     .drag-over-zone {
-      background-color: #dcfce7 !important; /* green-100 */
+      background-color: #dcfce7 !important;
+      /* green-100 */
       box-shadow: inset 0 0 0 4px #22c55e;
     }
 
     /* Animations */
     @keyframes popIn {
-      0% { transform: scale(0); opacity: 0; }
-      80% { transform: scale(1.1); opacity: 1; }
-      100% { transform: scale(1); opacity: 1; }
+      0% {
+        transform: scale(0);
+        opacity: 0;
+      }
+
+      80% {
+        transform: scale(1.1);
+        opacity: 1;
+      }
+
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
     }
+
     .animate-pop {
       animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
     }
 
     @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      20% { transform: translateX(-8px); }
-      40% { transform: translateX(8px); }
-      60% { transform: translateX(-4px); }
-      80% { transform: translateX(4px); }
+
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+
+      20% {
+        transform: translateX(-8px);
+      }
+
+      40% {
+        transform: translateX(8px);
+      }
+
+      60% {
+        transform: translateX(-4px);
+      }
+
+      80% {
+        transform: translateX(4px);
+      }
     }
+
     .animate-shake {
       animation: shake 0.5s ease-in-out;
       background-color: #fee2e2;
@@ -67,9 +106,18 @@
     }
 
     /* Custom Scrollbar */
-    .custom-scroll::-webkit-scrollbar { width: 8px; }
-    .custom-scroll::-webkit-scrollbar-track { background: #fff7ed; }
-    .custom-scroll::-webkit-scrollbar-thumb { background: #fdba74; border-radius: 4px; }
+    .custom-scroll::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .custom-scroll::-webkit-scrollbar-track {
+      background: #fff7ed;
+    }
+
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #fdba74;
+      border-radius: 4px;
+    }
 
     /* Print Styles */
     @media print {
@@ -77,26 +125,35 @@
         size: landscape;
         margin: 1cm;
       }
+
       body {
         background: white;
         height: auto;
         overflow: visible;
       }
+
       /* Hide UI controls */
-      #game-header, #bank-panel, #bravo-overlay, #error-toast, .no-print {
+      #game-header,
+      #bank-panel,
+      #bravo-overlay,
+      #error-toast,
+      .no-print {
         display: none !important;
       }
+
       /* Expand House Area */
       #main-layout {
         display: block;
         width: 100%;
         height: auto;
       }
+
       #house-section {
         width: 100%;
         height: auto;
         page-break-inside: avoid;
       }
+
       #print-header {
         display: block !important;
         text-align: center;
@@ -106,11 +163,15 @@
         border-bottom: 2px solid #333;
         padding-bottom: 10px;
       }
+
       /* Remove shadows for cleaner print */
-      .shadow-2xl, .shadow-xl, .drop-shadow-md {
+      .shadow-2xl,
+      .shadow-xl,
+      .drop-shadow-md {
         box-shadow: none !important;
         filter: none !important;
       }
+
       /* Ensure colors print */
       .grid-cell {
         border-color: #000;
@@ -120,94 +181,117 @@
     }
   </style>
 </head>
+
 <body class="h-screen w-screen flex flex-col overflow-hidden">
-<div class="hidden" id="print-header">
-<div class="flex justify-between items-center w-full px-10">
-<span>Nom : __________________________</span>
-<span>Date : __________________________</span>
-</div>
-</div>
-<header class="bg-white shadow-md z-30 px-6 py-3 flex justify-between items-center shrink-0" id="game-header">
-<div class="flex items-center gap-4">
-<div class="flex items-center gap-2">
-<span class="material-symbols-rounded text-green-600 text-4xl">home_app_logo</span>
-<h1 class="text-2xl md:text-3xl font-bold text-gray-800">La Maison des Sons [ON]</h1>
-</div>
-<div class="hidden md:flex bg-blue-50 px-4 py-2 rounded-xl text-sm text-blue-700 font-medium border border-blue-100">
-<span class="material-symbols-rounded text-base mr-2">info</span>
+  <div class="hidden" id="print-header">
+    <div class="flex justify-between items-center w-full px-10">
+      <span>Nom : __________________________</span>
+      <span>Date : __________________________</span>
+    </div>
+  </div>
+  <header class="bg-white shadow-md z-30 px-6 py-3 flex justify-between items-center shrink-0" id="game-header">
+    <div class="flex items-center gap-4">
+      <div class="flex items-center gap-2">
+        <span class="material-symbols-rounded text-green-600 text-4xl">home_app_logo</span>
+        <h1 class="text-2xl md:text-3xl font-bold text-gray-800">La Maison des Sons [ON]</h1>
+      </div>
+      <div
+        class="hidden md:flex bg-blue-50 px-4 py-2 rounded-xl text-sm text-blue-700 font-medium border border-blue-100">
+        <span class="material-symbols-rounded text-base mr-2">info</span>
         Glisse les images dans la maison pour gagner !
       </div>
-</div>
-<div class="flex items-center gap-3">
-<div class="bg-yellow-100 text-yellow-800 px-4 py-2 rounded-full font-bold shadow-sm flex items-center gap-2 border border-yellow-200">
-<span class="material-symbols-rounded text-yellow-600">star</span>
-<span id="score-display">0 / 16</span>
-</div>
-<button class="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 flex items-center justify-center transition-colors border border-gray-300" onclick="toggleAudio()">
-<span class="material-symbols-rounded" id="audio-icon">volume_up</span>
-</button>
-</div>
-</header>
-<div class="flex-1 flex flex-col md:flex-row px-4 pb-4 pt-8 gap-6 overflow-hidden max-w-7xl mx-auto w-full relative z-0" id="main-layout">
-<section class="flex-1 flex flex-col relative h-full min-h-0" id="house-section">
-<div class="h-32 md:h-40 relative z-10 w-full flex justify-center filter drop-shadow-xl">
-<div class="absolute inset-0 roof-container border-b-4 border-gray-800"></div>
-<svg class="absolute inset-0 w-full h-full pointer-events-none z-10" preserveAspectRatio="none" viewBox="0 0 100 100">
-<line stroke="#1f2937" stroke-width="0.8" x1="0" x2="50" y1="100" y2="0"></line>
-<line stroke="#1f2937" stroke-width="0.8" x1="100" x2="50" y1="100" y2="0"></line>
-</svg>
-<div class="absolute inset-0 flex items-end justify-center pb-2 gap-8 md:gap-16 z-20">
-<div class="flex flex-col items-center group cursor-pointer" onclick="speak('Le pont')">
-<img alt="Pont" class="w-16 h-16 md:w-20 md:h-20 object-contain drop-shadow-sm transition-transform group-hover:scale-110" src="images/pont.png"/>
-<span class="font-school text-xs text-gray-400 mt-1">Pont</span>
-</div>
-<div class="flex flex-col items-center mb-4">
-<div class="text-7xl font-black text-gray-800 tracking-widest leading-none">on</div>
-<div class="flex gap-4 text-2xl text-gray-400 font-bold opacity-60">
-<span>om</span>
-<span>on</span>
-</div>
-</div>
-<div class="flex flex-col items-center group cursor-pointer" onclick="speak('Le garçon fait le son on')">
-<img alt="Geste" class="w-16 h-16 md:w-20 md:h-20 object-contain drop-shadow-sm transition-transform group-hover:scale-110" src="images/geste.png"/>
-<span class="font-school text-xs text-gray-400 mt-1">Geste</span>
-</div>
-</div>
-</div>
-<div class="flex-1 bg-white border-x-4 border-b-4 border-gray-800 grid grid-cols-4 grid-rows-4 shadow-2xl relative" id="house-grid">
-</div>
-</section>
-<aside class="w-full md:w-80 lg:w-96 flex flex-col bg-orange-50 rounded-2xl shadow-xl border-4 border-orange-200 overflow-hidden shrink-0 h-48 md:h-auto transition-all" id="bank-panel">
-<div class="p-3 bg-orange-100 border-b border-orange-200 flex justify-between items-center">
-<h2 class="font-bold text-orange-900 flex items-center gap-2">
-<span class="material-symbols-rounded">category</span>
+    </div>
+    <div class="flex items-center gap-3">
+      <div
+        class="bg-yellow-100 text-yellow-800 px-4 py-2 rounded-full font-bold shadow-sm flex items-center gap-2 border border-yellow-200">
+        <span class="material-symbols-rounded text-yellow-600">star</span>
+        <span id="score-display">0 / 16</span>
+      </div>
+      <button
+        class="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 flex items-center justify-center transition-colors border border-gray-300"
+        onclick="toggleAudio()">
+        <span class="material-symbols-rounded" id="audio-icon">volume_up</span>
+      </button>
+    </div>
+  </header>
+  <div
+    class="flex-1 flex flex-col md:flex-row px-4 pb-4 pt-8 gap-6 overflow-hidden max-w-7xl mx-auto w-full relative z-0"
+    id="main-layout">
+    <section class="flex-1 flex flex-col relative h-full min-h-0" id="house-section">
+      <div class="h-32 md:h-40 relative z-10 w-full flex justify-center filter drop-shadow-xl">
+        <div class="absolute inset-0 roof-container border-b-4 border-gray-800"></div>
+        <svg class="absolute inset-0 w-full h-full pointer-events-none z-10" preserveAspectRatio="none"
+          viewBox="0 0 100 100">
+          <line stroke="#1f2937" stroke-width="0.8" x1="0" x2="50" y1="100" y2="0"></line>
+          <line stroke="#1f2937" stroke-width="0.8" x1="100" x2="50" y1="100" y2="0"></line>
+        </svg>
+        <div class="absolute inset-0 flex items-end justify-center pb-2 gap-8 md:gap-16 z-20">
+          <div class="flex flex-col items-center group cursor-pointer" onclick="speak('Le pont')">
+            <img alt="Pont"
+              class="w-16 h-16 md:w-20 md:h-20 object-contain drop-shadow-sm transition-transform group-hover:scale-110"
+              src="images/pont.png" />
+            <span class="font-school text-xs text-gray-400 mt-1">Pont</span>
+          </div>
+          <div class="flex flex-col items-center mb-4">
+            <div class="text-7xl font-black text-gray-800 tracking-widest leading-none">on</div>
+            <div class="flex gap-4 text-2xl text-gray-400 font-bold opacity-60">
+              <span>om</span>
+              <span>on</span>
+            </div>
+          </div>
+          <div class="flex flex-col items-center group cursor-pointer" onclick="speak('Le garçon fait le son on')">
+            <img alt="Geste"
+              class="w-16 h-16 md:w-20 md:h-20 object-contain drop-shadow-sm transition-transform group-hover:scale-110"
+              src="images/geste.png" />
+            <span class="font-school text-xs text-gray-400 mt-1">Geste</span>
+          </div>
+        </div>
+      </div>
+      <div
+        class="flex-1 min-h-0 overflow-hidden bg-white border-x-4 border-b-4 border-gray-800 grid grid-cols-4 grid-rows-4 shadow-2xl relative"
+        id="house-grid">
+      </div>
+    </section>
+    <aside
+      class="w-full md:w-80 lg:w-96 flex flex-col bg-orange-50 rounded-2xl shadow-xl border-4 border-orange-200 overflow-hidden shrink-0 h-48 md:h-auto transition-all"
+      id="bank-panel">
+      <div class="p-3 bg-orange-100 border-b border-orange-200 flex justify-between items-center">
+        <h2 class="font-bold text-orange-900 flex items-center gap-2">
+          <span class="material-symbols-rounded">category</span>
           Banque d'images
         </h2>
-<span class="text-xs font-bold text-orange-700 bg-orange-200 px-2 py-1 rounded-full" id="items-counter">-- restantes</span>
-</div>
-<div class="flex-1 overflow-y-auto p-3 custom-scroll bg-orange-50/50">
-<div class="grid grid-cols-3 md:grid-cols-2 gap-3 pb-8" id="item-bank">
-</div>
-</div>
-</aside>
-</div>
-<div class="fixed inset-0 pointer-events-none z-50 flex items-center justify-center hidden" id="bravo-overlay">
-<div class="bg-white/95 backdrop-blur-sm border-8 border-green-500 p-8 rounded-[3rem] shadow-2xl flex flex-col items-center animate-pop transform -rotate-2">
-<h2 class="text-8xl font-black text-transparent bg-clip-text bg-gradient-to-br from-green-500 to-emerald-700 drop-shadow-sm mb-2">BRAVO !</h2>
-<div class="bg-green-50 p-4 rounded-2xl border border-green-100 flex flex-col items-center">
-<img class="w-32 h-32 object-contain mb-2 drop-shadow-md" id="bravo-img" src=""/>
-<span class="text-4xl font-school font-bold text-gray-800" id="bravo-word">Mot</span>
-</div>
-<div class="mt-4 text-5xl">🎉 ✨</div>
-</div>
-</div>
-<div class="fixed top-24 left-1/2 -translate-x-1/2 pointer-events-none z-50 transition-all duration-300 opacity-0 transform -translate-y-4" id="error-toast">
-<div class="bg-red-500 text-white px-8 py-4 rounded-full shadow-2xl flex items-center gap-3 font-bold text-xl border-2 border-white">
-<span class="material-symbols-rounded text-3xl">cancel</span>
-<span>Ce mot n'a pas le son [ON] !</span>
-</div>
-</div>
-<script>
+        <span class="text-xs font-bold text-orange-700 bg-orange-200 px-2 py-1 rounded-full" id="items-counter">--
+          restantes</span>
+      </div>
+      <div class="flex-1 overflow-y-auto p-3 custom-scroll bg-orange-50/50">
+        <div class="grid grid-cols-3 md:grid-cols-2 gap-3 pb-8" id="item-bank">
+        </div>
+      </div>
+    </aside>
+  </div>
+  <div class="fixed inset-0 pointer-events-none z-50 flex items-center justify-center hidden" id="bravo-overlay">
+    <div
+      class="bg-white/95 backdrop-blur-sm border-8 border-green-500 p-8 rounded-[3rem] shadow-2xl flex flex-col items-center animate-pop transform -rotate-2">
+      <h2
+        class="text-8xl font-black text-transparent bg-clip-text bg-gradient-to-br from-green-500 to-emerald-700 drop-shadow-sm mb-2">
+        BRAVO !</h2>
+      <div class="bg-green-50 p-4 rounded-2xl border border-green-100 flex flex-col items-center">
+        <img class="w-32 h-32 object-contain mb-2 drop-shadow-md" id="bravo-img" src="" />
+        <span class="text-4xl font-school font-bold text-gray-800" id="bravo-word">Mot</span>
+      </div>
+      <div class="mt-4 text-5xl">🎉 ✨</div>
+    </div>
+  </div>
+  <div
+    class="fixed top-24 left-1/2 -translate-x-1/2 pointer-events-none z-50 transition-all duration-300 opacity-0 transform -translate-y-4"
+    id="error-toast">
+    <div
+      class="bg-red-500 text-white px-8 py-4 rounded-full shadow-2xl flex items-center gap-3 font-bold text-xl border-2 border-white">
+      <span class="material-symbols-rounded text-3xl">cancel</span>
+      <span>Ce mot n'a pas le son [ON] !</span>
+    </div>
+  </div>
+  <script>
     // --- Data Configuration ---
     const itemsData = [
       { id: 'trompette', word: 'trompette', correct: true, src: 'images/trompette.png' },
@@ -226,7 +310,7 @@
       { id: 'avion', word: 'avion', correct: true, src: 'images/avion.png' },
       { id: 'jonquille', word: 'jonquille', correct: true, src: 'images/jonquille.png' },
       { id: 'pigeon', word: 'pigeon', correct: true, src: 'images/pigeon.png' },
-      
+
       // Distractors (Incorrect)
       { id: 'kangourou', word: 'kangourou', correct: false, src: 'images/kangourou.png' },
       { id: 'banc', word: 'banc', correct: false, src: 'images/banc.png' },
@@ -262,7 +346,7 @@
         const cell = document.createElement('div');
         cell.className = 'grid-cell w-full h-full flex items-center justify-center relative';
         cell.dataset.index = i;
-        
+
         // Drag Events
         cell.addEventListener('dragover', (e) => {
           e.preventDefault();
@@ -271,7 +355,7 @@
             e.dataTransfer.dropEffect = 'move';
           }
         });
-        
+
         cell.addEventListener('dragleave', () => {
           cell.classList.remove('drag-over-zone');
         });
@@ -284,10 +368,10 @@
     function renderBank() {
       const bank = document.getElementById('item-bank');
       bank.innerHTML = '';
-      
+
       // Randomize order
       const shuffled = [...itemsData].sort(() => 0.5 - Math.random());
-      
+
       shuffled.forEach(item => {
         const card = createCard(item);
         bank.appendChild(card);
@@ -300,14 +384,14 @@
       card.id = `card-${item.id}`;
       card.className = 'bg-white rounded-xl p-2 shadow-sm border border-gray-200 flex flex-col items-center cursor-grab active:cursor-grabbing hover:shadow-lg transition-all select-none relative group transform hover:-translate-y-1';
       card.draggable = true;
-      
+
       // Drag Logic
       card.addEventListener('dragstart', (e) => {
         e.dataTransfer.setData('application/json', JSON.stringify(item));
         card.style.opacity = '0.5';
-        if(Tone.context.state !== 'running') Tone.start();
+        if (Tone.context.state !== 'running') Tone.start();
       });
-      
+
       card.addEventListener('dragend', () => {
         card.style.opacity = '1';
       });
@@ -326,22 +410,24 @@
       img.src = item.src;
       img.alt = item.word;
       img.className = 'w-16 h-16 md:w-20 md:h-20 object-contain pointer-events-none mb-2';
-      
+
       // SI L'IMAGE EST INTROUVABLE, ON AFFICHE UN PLACEHOLDER "ERREUR"
-      img.onerror = function() {
+      img.onerror = function () {
         this.src = 'https://placehold.co/100/red/white?text=Nom?';
         this.title = "Vérifie le nom du fichier dans le dossier images !";
       };
 
-      // Label
+      // Label removed as per user request
+      /*
       const label = document.createElement('span');
       label.textContent = item.word;
       label.className = 'font-school text-lg font-bold text-gray-700 leading-none';
+      */
 
       card.appendChild(soundBtn);
       card.appendChild(img);
-      card.appendChild(label);
-      
+      // card.appendChild(label);
+
       return card;
     }
 
@@ -355,7 +441,7 @@
 
       const data = e.dataTransfer.getData('application/json');
       if (!data) return;
-      
+
       const item = JSON.parse(data);
       const originalCard = document.getElementById(`card-${item.id}`);
 
@@ -377,20 +463,20 @@
 
       // Populate Cell
       const content = document.createElement('div');
-      content.className = 'w-full h-full flex flex-col items-center justify-center animate-pop p-1';
-      
+      content.className = 'w-full h-full flex flex-col items-center justify-center animate-pop p-1 overflow-hidden';
+
       const img = document.createElement('img');
       img.src = item.src;
-      img.className = 'w-3/4 h-3/4 object-contain drop-shadow-sm';
+      img.className = 'max-w-full max-h-[70%] object-contain drop-shadow-sm';
       // Error handling for dropped image too
-      img.onerror = function() {
+      img.onerror = function () {
         this.src = 'https://placehold.co/100/red/white?text=Nom?';
       };
-      
+
       const text = document.createElement('span');
       text.textContent = item.word;
-      text.className = 'font-school text-sm md:text-base font-bold text-gray-800 mt-1';
-      
+      text.className = 'font-school text-xs md:text-sm font-bold text-gray-800 mt-1 truncate max-w-full text-center';
+
       content.appendChild(img);
       content.appendChild(text);
       cell.appendChild(content);
@@ -404,19 +490,64 @@
       showBravo(item);
 
       if (score === 16) {
-        setTimeout(() => speak("Félicitations ! La maison est complète !"), 2000);
+        setTimeout(endGame, 1000);
       }
+    }
+
+    function endGame() {
+      // Victory Music
+      if (audioEnabled) {
+        const melody = [
+          { note: "C5", time: 0 }, { note: "D5", time: 0.2 }, { note: "E5", time: 0.4 },
+          { note: "F5", time: 0.6 }, { note: "G5", time: 0.8 }, { note: "A5", time: 1.0 },
+          { note: "B5", time: 1.2 }, { note: "C6", time: 1.4 }
+        ];
+        const synth = new Tone.Synth().toDestination();
+        const now = Tone.now();
+        melody.forEach(m => {
+          synth.triggerAttackRelease(m.note, "8n", now + m.time);
+        });
+      }
+
+      speak("la maison est complète. Bravo !");
+
+      // Fireworks
+      const pyrotechnics = setInterval(() => {
+        const x = Math.random() * window.innerWidth;
+        const y = Math.random() * window.innerHeight;
+        // Re-use existing confetti function but bigger/more
+        spawnConfetti({ getBoundingClientRect: () => ({ left: x, top: y, width: 0, height: 0 }) });
+      }, 300);
+
+      // Overlay with Replay Button
+      const overlay = document.createElement('div');
+      overlay.className = 'fixed inset-0 z-[100] bg-black/60 flex flex-col items-center justify-center animate-pop backdrop-blur-sm';
+      overlay.innerHTML = `
+        <div class="bg-white p-8 rounded-3xl shadow-2xl flex flex-col items-center gap-6 border-4 border-yellow-400">
+             <h1 class="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-orange-600 drop-shadow-sm">VICTOIRE !</h1>
+             <div class="text-8xl">🏆</div>
+             <p class="font-school text-2xl text-gray-600">Tu as trouvé tous les mots !</p>
+             <button onclick="location.reload()" class="bg-gradient-to-r from-green-500 to-emerald-600 text-white text-2xl font-bold py-4 px-12 rounded-full shadow-lg hover:scale-105 active:scale-95 transition-transform flex items-center gap-3">
+                <span class="material-symbols-rounded text-4xl">replay</span>
+                Rejouer
+             </button>
+        </div>
+      `;
+      document.body.appendChild(overlay);
+
+      // Stop fireworks after 5 seconds
+      setTimeout(() => clearInterval(pyrotechnics), 5000);
     }
 
     function handleError(card) {
       playErrorSound();
       speak("Essaie encore");
-      
+
       // Toast
       const toast = document.getElementById('error-toast');
       toast.style.opacity = '1';
       toast.style.transform = 'translate(-50%, 0)';
-      
+
       setTimeout(() => {
         toast.style.opacity = '0';
         toast.style.transform = 'translate(-50%, -1rem)';
@@ -444,10 +575,10 @@
       const overlay = document.getElementById('bravo-overlay');
       const img = document.getElementById('bravo-img');
       const text = document.getElementById('bravo-word');
-      
+
       img.src = item.src;
       text.textContent = item.word;
-      
+
       overlay.classList.remove('hidden');
       setTimeout(() => overlay.classList.add('hidden'), 1500);
     }
@@ -509,4 +640,5 @@
 
   </script>
 </body>
+
 </html>
