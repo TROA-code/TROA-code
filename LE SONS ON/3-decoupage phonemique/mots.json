@@ -1,0 +1,130 @@
+[
+    {
+        "word": "pont",
+        "syllables": 1,
+        "target": [
+            0
+        ]
+    },
+    {
+        "word": "ronce",
+        "syllables": 2,
+        "target": [
+            0
+        ]
+    },
+    {
+        "word": "avion",
+        "syllables": 2,
+        "target": [
+            1
+        ]
+    },
+    {
+        "word": "ballon",
+        "syllables": 2,
+        "target": [
+            1
+        ]
+    },
+    {
+        "word": "blouson",
+        "syllables": 2,
+        "target": [
+            1
+        ]
+    },
+    {
+        "word": "camion",
+        "syllables": 2,
+        "target": [
+            1
+        ]
+    },
+    {
+        "word": "dindon",
+        "syllables": 2,
+        "target": [
+            1
+        ]
+    },
+    {
+        "word": "eponge",
+        "label": "éponge",
+        "syllables": 3,
+        "target": [
+            1
+        ]
+    },
+    {
+        "word": "maison",
+        "syllables": 2,
+        "target": [
+            1
+        ]
+    },
+    {
+        "word": "menton",
+        "syllables": 2,
+        "target": [
+            1
+        ]
+    },
+    {
+        "word": "mouton",
+        "syllables": 2,
+        "target": [
+            1
+        ]
+    },
+    {
+        "word": "ombre",
+        "syllables": 2,
+        "target": [
+            0
+        ]
+    },
+    {
+        "word": "pigeon",
+        "syllables": 2,
+        "target": [
+            1
+        ]
+    },
+    {
+        "word": "poison",
+        "syllables": 2,
+        "target": [
+            1
+        ]
+    },
+    {
+        "word": "herisson",
+        "label": "hérisson",
+        "syllables": 3,
+        "target": [
+            2
+        ]
+    },
+    {
+        "word": "jonquille",
+        "syllables": 3,
+        "target": [
+            0
+        ]
+    },
+    {
+        "word": "pantalon",
+        "syllables": 3,
+        "target": [
+            2
+        ]
+    },
+    {
+        "word": "papillon",
+        "syllables": 3,
+        "target": [
+            2
+        ]
+    }
+]

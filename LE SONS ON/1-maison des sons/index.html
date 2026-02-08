@@ -229,7 +229,7 @@
           <div class="flex flex-col items-center group cursor-pointer" onclick="speak('Le pont')">
             <img alt="Pont"
               class="w-16 h-16 md:w-20 md:h-20 object-contain drop-shadow-sm transition-transform group-hover:scale-110"
-              src="images/pont.png" />
+              src="../images/pont.png" />
             <span class="font-school text-xs text-gray-400 mt-1">Pont</span>
           </div>
           <div class="flex flex-col items-center mb-4">
@@ -242,7 +242,7 @@
           <div class="flex flex-col items-center group cursor-pointer" onclick="speak('Le garçon fait le son on')">
             <img alt="Geste"
               class="w-16 h-16 md:w-20 md:h-20 object-contain drop-shadow-sm transition-transform group-hover:scale-110"
-              src="images/geste.png" />
+              src="../images/geste.png" />
             <span class="font-school text-xs text-gray-400 mt-1">Geste</span>
           </div>
         </div>
@@ -294,28 +294,28 @@
   <script>
     // --- Data Configuration ---
     const itemsData = [
-      { id: 'trompette', word: 'trompette', correct: true, src: 'images/trompette.png' },
-      { id: 'maison', word: 'maison', correct: true, src: 'images/maison.png' },
-      { id: 'ombre', word: 'ombre', correct: true, src: 'images/ombre.png' },
-      { id: 'eponge', word: 'éponge', correct: true, src: 'images/eponge.png' },
-      { id: 'ballon', word: 'ballon', correct: true, src: 'images/ballon.png' },
-      { id: 'dindon', word: 'dindon', correct: true, src: 'images/dindon.png' },
-      { id: 'poison', word: 'poison', correct: true, src: 'images/poison.png' },
-      { id: 'blouson', word: 'blouson', correct: true, src: 'images/blouson.png' },
-      { id: 'pantalon', word: 'pantalon', correct: true, src: 'images/pantalon.png' },
-      { id: 'camion', word: 'camion', correct: true, src: 'images/camion.png' },
-      { id: 'violon', word: 'violon', correct: true, src: 'images/violon.png' },
-      { id: 'papillon', word: 'papillon', correct: true, src: 'images/papillon.png' },
-      { id: 'herisson', word: 'hérisson', correct: true, src: 'images/herisson.png' },
-      { id: 'avion', word: 'avion', correct: true, src: 'images/avion.png' },
-      { id: 'jonquille', word: 'jonquille', correct: true, src: 'images/jonquille.png' },
-      { id: 'pigeon', word: 'pigeon', correct: true, src: 'images/pigeon.png' },
+      { id: 'trompette', word: 'trompette', correct: true, src: '../images/trompette.png' },
+      { id: 'maison', word: 'maison', correct: true, src: '../images/maison.png' },
+      { id: 'ombre', word: 'ombre', correct: true, src: '../images/ombre.png' },
+      { id: 'eponge', word: 'éponge', correct: true, src: '../images/eponge.png' },
+      { id: 'ballon', word: 'ballon', correct: true, src: '../images/ballon.png' },
+      { id: 'dindon', word: 'dindon', correct: true, src: '../images/dindon.png' },
+      { id: 'poison', word: 'poison', correct: true, src: '../images/poison.png' },
+      { id: 'blouson', word: 'blouson', correct: true, src: '../images/blouson.png' },
+      { id: 'pantalon', word: 'pantalon', correct: true, src: '../images/pantalon.png' },
+      { id: 'camion', word: 'camion', correct: true, src: '../images/camion.png' },
+      { id: 'violon', word: 'violon', correct: true, src: '../images/violon.png' },
+      { id: 'papillon', word: 'papillon', correct: true, src: '../images/papillon.png' },
+      { id: 'herisson', word: 'hérisson', correct: true, src: '../images/herisson.png' },
+      { id: 'avion', word: 'avion', correct: true, src: '../images/avion.png' },
+      { id: 'jonquille', word: 'jonquille', correct: true, src: '../images/jonquille.png' },
+      { id: 'pigeon', word: 'pigeon', correct: true, src: '../images/pigeon.png' },
 
       // Distractors (Incorrect)
-      { id: 'kangourou', word: 'kangourou', correct: false, src: 'images/kangourou.png' },
-      { id: 'banc', word: 'banc', correct: false, src: 'images/banc.png' },
-      { id: 'poussette', word: 'poussette', correct: false, src: 'images/poussette.png' },
-      { id: 'parapluie', word: 'parapluie', correct: false, src: 'images/parapluie.png' }
+      { id: 'kangourou', word: 'kangourou', correct: false, src: '../images/kangourou.png' },
+      { id: 'banc', word: 'banc', correct: false, src: '../images/banc.png' },
+      { id: 'poussette', word: 'poussette', correct: false, src: '../images/poussette.png' },
+      { id: 'parapluie', word: 'parapluie', correct: false, src: '../images/parapluie.png' }
     ];
 
     let audioEnabled = true;
