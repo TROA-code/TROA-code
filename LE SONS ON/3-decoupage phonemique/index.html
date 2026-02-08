@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Phonologie - Le Son [ON]</title>
+    
+    <!-- Bibliothèques distantes -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet"/>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Andika&family=Fredoka:wght@400;600&display=swap');
+        
+        body {
+            font-family: 'Andika', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+            padding: 2.5rem 1rem;
+            margin: 0;
+        }
+
+        .cursive { font-family: 'Fredoka', sans-serif; }
+
+        /* Les ronds pour les segments */
+        .segment-circle {
+            width: 70px;
+            height: 70px;
+            border: 4px solid #475569;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            background: white;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            user-select: none;
+            position: relative;
+        }
+
+        .segment-circle:hover {
+            border-color: #3b82f6;
+            transform: scale(1.1);
+            background-color: #f0f9ff;
+        }
+
+        /* Croix NOIRE (X) */
+        .segment-circle.marked::after {
+            content: 'X';
+            font-size: 3.5rem;
+            color: #000000; /* NOIR */
+            font-weight: 800;
+            font-family: 'Fredoka', sans-serif;
+            line-height: 1;
+            animation: popIn 0.2s ease-out;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Bouton numéro style "jeton" */
+        .token-num {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            background: #cbd5e1;
+            border: 4px solid #334155;
+            box-shadow: 0 5px 0 #334155;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #0f172a;
+            transition: all 0.1s;
+        }
+
+        .token-num.active {
+            background: #3b82f6;
+            color: white;
+            border-color: #1e3a8a;
+            box-shadow: 0 5px 0 #1e3a8a;
+        }
+
+        /* Le mot cliquable */
+        .word-btn {
+            font-size: 3.5rem;
+            font-weight: 600;
+            color: #1e293b;
+            cursor: pointer;
+            padding: 4px 20px;
+            border-radius: 15px;
+            transition: all 0.2s;
+            border-bottom: 6px dashed #cbd5e1;
+            line-height: 1.2;
+        }
+
+        .word-btn:hover {
+            color: #2563eb;
+            background-color: #eff6ff;
+            border-bottom-color: #2563eb;
+        }
+
+        /* Cadres images */
+        .image-card {
+            width: 180px;
+            height: 180px;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            border-radius: 2.5rem;
+            border: 6px solid #ffffff;
+            background: white;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .image-card:hover {
+            transform: translateY(-5px);
+            border-color: #3b82f6;
+        }
+
+        .validate-btn {
+            background: #0ea5e9;
+            color: white;
+            padding: 15px 35px;
+            border-radius: 50px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s;
+            box-shadow: 0 6px 0 #0369a1;
+            font-size: 1.2rem;
+        }
+
+        .validate-btn:hover { background: #0284c7; }
+        .validate-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #0369a1; }
+
+        .success-bg { background: linear-gradient(to right, #ecfdf5, #f0fdf4); }
+        .fade-in { animation: fadeIn 0.5s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <div class="max-w-6xl mx-auto bg-white rounded-[4rem] border-[16px] border-slate-100 shadow-2xl overflow-hidden">
+        
+        <!-- En-tête -->
+        <header class="bg-slate-50 p-12 border-b border-slate-200">
+            <div class="flex flex-col md:flex-row items-center gap-12">
+                <div class="w-24 h-24 border-4 border-slate-900 flex items-center justify-center text-6xl font-black bg-white shadow-2xl rotate-2">?</div>
+                <div>
+                    <h1 class="text-4xl font-black uppercase text-slate-800 tracking-tight mb-4">Découpage Phonémique : Le son [ON]</h1>
+                    <div class="text-slate-600 font-semibold space-y-2 text-xl italic">
+                        <p>1. Cliquez sur l'image pour entendre le mot.</p>
+                        <p>2. Cliquez sur le mot pour voir les ronds.</p>
+                        <p>3. Cliquez dans les ronds pour mettre la croix.</p>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Grille de Jeu -->
+        <main class="p-12 space-y-24" id="game-grid"></main>
+
+        <!-- Bas de page -->
+        <footer class="bg-slate-50 p-12 border-t border-slate-200 flex flex-col md:flex-row justify-between items-center gap-10">
+            <button class="flex items-center gap-4 text-slate-500 hover:text-blue-600 font-black transition text-2xl uppercase tracking-wider" onclick="resetGame()">
+                <span class="material-symbols-outlined text-4xl">restart_alt</span> Recommencer
+            </button>
+            <div class="text-5xl font-black text-blue-600 uppercase tracking-[0.2em]" id="global-status"></div>
+        </footer>
+    </div>
+
+    <script>
+        // --- CONFIGURATION DES CHEMINS D'IMAGES ---
+        const EXERCISES = [
+            { id: 1, word: "pont", count: 1, targetIndices: [0], img: "images/pont.png" },
+            { id: 2, word: "menton", count: 2, targetIndices: [1], img: "images/menton.png" },
+            { id: 3, word: "mouton", count: 2, targetIndices: [1], img: "images/mouton.png" },
+            { id: 4, word: "ronce", count: 2, targetIndices: [0], img: "images/ronce.png" }
+        ];
+
+        let state = EXERCISES.map(item => ({
+            ...item,
+            isRevealed: false,
+            showCircles: false,
+            userChoices: new Array(item.count).fill(false),
+            isDone: false
+        }));
+
+        // --- AUDIO (Tone.js) ---
+        const synth = new Tone.PolySynth(Tone.Synth).toDestination();
+        synth.set({
+            oscillator: { type: "triangle" },
+            envelope: { attack: 0.05, decay: 0.1, sustain: 0.3, release: 1 }
+        });
+
+        function playWinMelody() {
+            const now = Tone.now();
+            synth.triggerAttackRelease("C4", "16n", now);
+            synth.triggerAttackRelease("E4", "16n", now + 0.1);
+            synth.triggerAttackRelease("G4", "16n", now + 0.2);
+            synth.triggerAttackRelease("C5", "8n", now + 0.3);
+        }
+
+        function playFullWinMusic() {
+            const now = Tone.now();
+            ["C4", "E4", "G4", "C5", "E5", "G5", "C6"].forEach((note, i) => {
+                synth.triggerAttackRelease(note, "16n", now + i * 0.1);
+            });
+        }
+
+        // --- RENDU ---
+        function render() {
+            const grid = document.getElementById('game-grid');
+            grid.innerHTML = '';
+
+            state.forEach((item, idx) => {
+                const row = document.createElement('div');
+                row.className = `flex flex-col md:flex-row items-center gap-16 p-8 rounded-[4rem] transition-all duration-500 ${item.isDone ? 'success-bg shadow-inner border border-emerald-100' : ''}`;
+
+                row.innerHTML = `
+                    <div class="flex items-center gap-10 min-w-[360px]">
+                        <button onclick="revealWord(${idx})" class="token-num ${item.isRevealed ? 'active' : ''}">
+                            ${item.id}
+                        </button>
+                        <div onclick="revealWord(${idx})" class="image-card">
+                            <img src="${item.img}" class="w-full h-full object-cover" alt="${item.word}" onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=\'text-gray-300 italic text-xs\'>Image: ${item.img}</span>'">
+                        </div>
+                    </div>
+                    <div class="min-w-[250px] text-center md:text-left">
+                        ${item.isRevealed ? `
+                            <div class="flex items-center gap-6 justify-center md:justify-start fade-in">
+                                <span onclick="revealCircles(${idx})" class="word-btn cursive">${item.word}</span>
+                                <button onclick="sayWord('${item.word}')" class="text-slate-300 hover:text-blue-500 transition">
+                                    <span class="material-symbols-outlined text-6xl">volume_up</span>
+                                </button>
+                            </div>
+                        ` : ''}
+                    </div>
+                    ${item.showCircles ? `
+                        <div class="flex flex-wrap items-center justify-center gap-12 fade-in flex-1">
+                            <div class="flex gap-8">
+                                ${item.userChoices.map((marked, mIdx) => `
+                                    <div onclick="toggleMark(${idx}, ${mIdx})" class="segment-circle ${marked ? 'marked' : ''}"></div>
+                                `).join('')}
+                            </div>
+                            <button onclick="checkExercise(${idx})" class="validate-btn">
+                                <span class="material-symbols-outlined text-2xl">verified</span> VALIDER
+                            </button>
+                            <div id="fb-${idx}" class="font-black text-4xl min-w-[200px] text-center"></div>
+                        </div>
+                    ` : ''}`;
+                grid.appendChild(row);
+
+                if (item.isDone) {
+                    const fb = document.getElementById(`fb-${idx}`);
+                    if (fb) fb.innerHTML = '<span class="text-emerald-600 animate-bounce block">GAGNÉ ! ✨</span>';
+                }
+            });
+
+            updateGlobalStatus();
+        }
+
+        // --- ACTIONS ---
+        function revealWord(idx) {
+            state[idx].isRevealed = true;
+            sayWord(state[idx].word);
+            render();
+        }
+
+        function revealCircles(idx) {
+            if (state[idx].isRevealed) {
+                state[idx].showCircles = true;
+                render();
+            }
+        }
+
+        function toggleMark(exIdx, markIdx) {
+            if (state[exIdx].isDone) return;
+            state[exIdx].userChoices[markIdx] = !state[exIdx].userChoices[markIdx];
+            render();
+        }
+
+        async function checkExercise(idx) {
+            const item = state[idx];
+            const feedback = document.getElementById(`fb-${idx}`);
+            const selected = item.userChoices.map((v, i) => v ? i : null).filter(v => v !== null);
+            
+            if (JSON.stringify(selected.sort()) === JSON.stringify(item.targetIndices.sort())) {
+                state[idx].isDone = true;
+                await Tone.start();
+                playWinMelody();
+                render();
+            } else {
+                feedback.innerHTML = '<span class="text-slate-400 animate-pulse italic text-2xl">Réessaie !</span>';
+                setTimeout(() => { render(); }, 1200);
+            }
+        }
+
+        function sayWord(t) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const u = new SpeechSynthesisUtterance(t);
+                u.lang = 'fr-FR';
+                u.rate = 0.8;
+                window.speechSynthesis.speak(u);
+            }
+        }
+
+        function updateGlobalStatus() {
+            const total = state.length;
+            const solvedCount = state.filter(s => s.isDone).length;
+            const statusText = document.getElementById('global-status');
+            if (solvedCount === total) {
+                statusText.innerHTML = '👑 CHAMPION ! 👑';
+                statusText.classList.add('animate-bounce');
+                playFullWinMusic();
+            } else if (solvedCount > 0) {
+                statusText.innerHTML = `BRAVO : ${solvedCount} / ${total}`;
+            }
+        }
+
+        function resetGame() {
+            state = EXERCISES.map(item => ({...item, isRevealed: false, showCircles: false, userChoices: new Array(item.count).fill(false), isDone: false }));
+            document.getElementById('global-status').classList.remove('animate-bounce');
+            render();
+        }
+
+        window.onload = render;
+    </script>
+</body>
+</html>
