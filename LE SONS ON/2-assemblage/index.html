@@ -198,7 +198,7 @@
         <!-- Zone d'affichage -->
         <div class="flex flex-col items-center gap-12 mt-12">
             <div class="flex items-center gap-6 md:gap-12" id="slot-area">
-                <div class="card card-consonant" id="display-consonant">P</div>
+                <div class="card card-consonant" id="display-consonant">p</div>
                 <div class="card card-vowel" id="display-ending">on</div>
             </div>
 
@@ -288,7 +288,7 @@
         }
 
         function updateDisplay() {
-            document.getElementById('display-consonant').textContent = currentConsonant.toUpperCase();
+            document.getElementById('display-consonant').textContent = currentConsonant;
             document.getElementById('display-ending').textContent = currentEnding;
         }
 
