@@ -36,11 +36,12 @@ body {
     color: var(--text-primary);
     line-height: 1.6;
     min-height: 100vh;
-    /* Image de fond en plein écran */
-    background-image: url('./supports/fond.png');
+    margin: 0;
+    /* Image de fond en plein écran fixe sans la propriété 'fixed' problématique */
+    background-image: url('supports/fond.png');
     background-size: cover;
     background-position: center;
-    background-attachment: fixed;
+    background-repeat: no-repeat;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -62,6 +63,7 @@ header h1 {
     font-size: 3rem;
     font-weight: 800;
     background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+    background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     margin-bottom: var(--spacing-sm);
