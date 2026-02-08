@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Machine à Syllabes - Atelier de Lecture</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #0d84a3;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
+            touch-action: manipulation;
+        }
+
+        .card {
+            background: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 8px 0 rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+            font-weight: 800;
+            transition: all 0.2s ease;
+            width: 140px;
+            height: 180px;
+            user-select: none;
+        }
+
+        .card-consonant {
+            color: #0d84a3;
+            border: 4px solid #e2e8f0;
+        }
+
+        .card-vowel {
+            color: #7c2d12;
+            border: 4px solid #fde68a;
+        }
+
+        .btn-consonant {
+            background: white;
+            color: #1e293b;
+            font-size: 1.5rem;
+            font-weight: 700;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 0 #cbd5e1;
+            transition: all 0.1s;
+            min-width: 60px;
+        }
+
+        .btn-consonant.active {
+            background: #f59e0b;
+            color: white;
+            box-shadow: 0 4px 0 #b45309;
+            transform: translateY(2px);
+        }
+
+        .btn-assemble {
+            background: #f59e0b;
+            color: #451a03;
+            font-size: 1.5rem;
+            font-weight: 800;
+            padding: 1.25rem 3rem;
+            border-radius: 2rem;
+            box-shadow: 0 6px 0 #b45309;
+            text-transform: uppercase;
+            transition: all 0.1s;
+        }
+
+        .btn-assemble:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #b45309;
+        }
+
+        .main-content {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Overlay Règle MBP */
+        #mbp-rule-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(13, 132, 163, 0.9);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(8px);
+            animation: fadeIn 0.3s ease-out;
+            cursor: pointer;
+        }
+
+        .rule-card {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 3rem;
+            text-align: center;
+            max-width: 500px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            border: 8px solid #f59e0b;
+            transform: scale(0.8);
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        .rule-img {
+            width: 250px;
+            height: auto;
+            margin: 0 auto 1.5rem;
+            border-radius: 1.5rem;
+        }
+
+        .rule-text {
+            color: #1e293b;
+            font-size: 1.8rem;
+            font-weight: 800;
+            line-height: 1.3;
+        }
+
+        .highlight-mbp {
+            color: #ef4444;
+            display: block;
+            font-size: 3rem;
+            margin-top: 0.5rem;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes popIn {
+            0% {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex flex-col items-center py-8 px-4">
+
+    <!-- Overlay Règle MBP -->
+    <div id="mbp-rule-overlay" onclick="this.style.display='none'">
+        <div class="rule-card">
+            <img src="image.png" alt="Règle MBP" class="rule-img">
+            <p class="rule-text">
+                On utilise le <span class="text-orange-500">M</span> devant :
+                <span class="highlight-mbp">M - B - P</span>
+            </p>
+            <p class="text-slate-400 text-xs mt-4 uppercase font-bold tracking-widest">Clique pour fermer</p>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <!-- Header -->
+        <div class="w-full max-w-5xl flex items-center justify-between mb-8">
+            <div class="flex items-center gap-4">
+                <div class="bg-white/20 p-3 rounded-2xl border-2 border-white/30 text-white">
+                    <i class="fas fa-sliders-h text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-white text-2xl md:text-3xl font-black leading-none uppercase">Machine à Syllabes
+                    </h1>
+                    <p class="text-white/80 text-xs font-bold uppercase mt-1">Atelier de Lecture</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <button onclick="toggleEnding()"
+                    class="bg-white/20 text-white px-3 py-2 rounded-lg text-sm font-bold border border-white/30 hover:bg-white/30 transition-all">
+                    Passer en <span id="ending-toggle-text">OM</span>
+                </button>
+                <button onclick="randomize()"
+                    class="bg-white text-slate-800 p-3 rounded-lg shadow-lg hover:scale-105 active:scale-95 transition-all">
+                    <i class="fas fa-dice text-xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Zone d'affichage -->
+        <div class="flex flex-col items-center gap-12 mt-12">
+            <div class="flex items-center gap-6 md:gap-12" id="slot-area">
+                <div class="card card-consonant" id="display-consonant">P</div>
+                <div class="card card-vowel" id="display-ending">on</div>
+            </div>
+
+            <button onclick="assemble()" class="btn-assemble flex items-center gap-3">
+                <i class="fas fa-bolt"></i>
+                ASSEMBLAGE !
+            </button>
+        </div>
+
+        <!-- Panel de sélection des consonnes -->
+        <div class="mt-16 bg-white/10 p-6 rounded-3xl max-w-4xl w-full">
+            <p class="text-center text-white/60 font-bold uppercase text-xs tracking-widest mb-6">Choisis une lettre</p>
+            <div class="grid grid-cols-4 md:grid-cols-8 gap-4" id="consonant-buttons"></div>
+        </div>
+    </div>
+
+    <script>
+        const consonants = ['p', 'b', 'm', 't', 'd', 'n', 'c', 'g', 'f', 'v', 's', 'z', 'j', 'r', 'l', 'ch'];
+
+        // Mappage phonétique validé par vos tests (le n°7 était "zons")
+        const phoneticMap = {
+            'pon': 'pont',
+            'bon': 'bon',
+            'mon': 'mon',
+            'ton': 'ton',
+            'don': 'dont',
+            'non': 'non',
+            'con': "qu'on",
+            'gon': 'gond',
+            'fon': 'font',
+            'von': 'vont',
+            'son': 'son',
+            'zon': 'zons',   // Correction validée n°7
+            'jon': 'jonc',
+            'ron': 'rond',
+            'lon': 'long',
+            'chon': 'chons', // Application de la même logique
+            'pom': 'pont',
+            'bom': 'bon',
+            'mom': 'mon',
+            'tom': 'ton',
+            'dom': 'dont',
+            'nom': 'non',
+            'com': "qu'on",
+            'gom': 'gond',
+            'fom': 'font',
+            'vom': 'vont',
+            'som': 'son',
+            'zom': 'zons',
+            'jom': 'jonc',
+            'rom': 'rond',
+            'lom': 'long',
+            'chom': 'chons'
+        };
+
+        let currentConsonant = 'p';
+        let currentEnding = 'on';
+
+        function init() {
+            const container = document.getElementById('consonant-buttons');
+            consonants.forEach(c => {
+                const btn = document.createElement('button');
+                btn.className = `btn-consonant ${c === currentConsonant ? 'active' : ''}`;
+                btn.textContent = c;
+                btn.onclick = () => selectConsonant(c, btn);
+                container.appendChild(btn);
+            });
+            updateDisplay();
+        }
+
+        function selectConsonant(c, btnElement) {
+            currentConsonant = c;
+            document.querySelectorAll('.btn-consonant').forEach(b => b.classList.remove('active'));
+            if (btnElement) btnElement.classList.add('active');
+            updateDisplay();
+        }
+
+        function toggleEnding() {
+            currentEnding = currentEnding === 'on' ? 'om' : 'on';
+            document.getElementById('ending-toggle-text').textContent = currentEnding === 'on' ? 'OM' : 'ON';
+            updateDisplay();
+
+            if (currentEnding === 'om') {
+                const overlay = document.getElementById('mbp-rule-overlay');
+                overlay.style.display = 'flex';
+            }
+        }
+
+        function updateDisplay() {
+            document.getElementById('display-consonant').textContent = currentConsonant.toUpperCase();
+            document.getElementById('display-ending').textContent = currentEnding;
+        }
+
+        function randomize() {
+            const randomIndex = Math.floor(Math.random() * consonants.length);
+            const selected = consonants[randomIndex];
+            // On trouve le bouton correspondant pour l'effet visuel
+            const buttons = document.querySelectorAll('.btn-consonant');
+            buttons.forEach(b => {
+                if (b.textContent === selected) selectConsonant(selected, b);
+            });
+        }
+
+        function playText(textToSpeak, isAssembly = false) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(textToSpeak);
+
+            // Sélection automatique de la meilleure voix française
+            const voices = window.speechSynthesis.getVoices();
+            const frVoice = voices.find(v => v.lang.startsWith('fr') && (v.name.includes('Google') || v.name.includes('Premium'))) ||
+                voices.find(v => v.lang.startsWith('fr'));
+
+            if (frVoice) utterance.voice = frVoice;
+            utterance.lang = 'fr-FR';
+            utterance.rate = isAssembly ? 0.85 : 1.0;
+            utterance.pitch = 1.0;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function assemble() {
+            const key = currentConsonant + currentEnding;
+            const phoneticWord = phoneticMap[key] || key;
+
+            const slotArea = document.getElementById('slot-area');
+            const cardL = document.getElementById('display-consonant');
+            const cardR = document.getElementById('display-ending');
+
+            // Animation visuelle de rapprochement
+            slotArea.classList.add('assembling');
+            cardL.style.transform = 'translateX(20px)';
+            cardR.style.transform = 'translateX(-20px)';
+
+            playText(phoneticWord, true);
+
+            setTimeout(() => {
+                slotArea.classList.remove('assembling');
+                cardL.style.transform = 'translateX(0)';
+                cardR.style.transform = 'translateX(0)';
+            }, 600);
+        }
+
+        // On s'assure que les voix sont prêtes
+        window.speechSynthesis.onvoiceschanged = () => { };
+        window.onload = init;
+    </script>
+</body>
+
+</html>
