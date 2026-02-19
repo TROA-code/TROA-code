@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercice : Dans Paris - Paul Éluard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;700&family=Inter:wght@400;600&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        .poem-font {
+            font-family: 'Crimson Pro', serif;
+            font-size: 1.25rem;
+            line-height: 2.2;
+        }
+
+        .input-blank {
+            appearance: none;
+            width: 80px;
+            text-align: center;
+            border-bottom: 2px solid #cbd5e1;
+            background: #f1f5f9;
+            border-radius: 4px 4px 0 0;
+            transition: all 0.3s ease;
+            outline: none;
+            color: #1e293b;
+            font-weight: 700;
+            cursor: pointer;
+            padding: 0 5px;
+        }
+
+        .input-blank:focus {
+            border-bottom-color: #3b82f6;
+            background: #e2e8f0;
+        }
+
+        .correct {
+            border-bottom-color: #22c55e !important;
+            background-color: #f0fdf4 !important;
+            color: #15803d !important;
+        }
+
+        .incorrect {
+            border-bottom-color: #ef4444 !important;
+            background-color: #fef2f2 !important;
+            color: #b91c1c !important;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <div class="max-w-2xl w-full bg-white rounded-2xl shadow-xl p-8 md:p-12 fade-in">
+        <header class="text-center mb-10">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">Choisissez "un" ou "une"</h1>
+            <p class="text-gray-500 italic">D'après le poème de Paul Éluard</p>
+        </header>
+
+        <div class="poem-font text-gray-700 space-y-2 mb-10">
+            <p class="font-bold text-xl text-blue-700 mb-4 text-center sm:text-left">Dans Paris</p>
+            
+            <div class="flex flex-wrap items-center gap-x-2">Dans Paris, il y a <select data-answer="une" class="input-blank"><option value="">...</option><option value="un">un</option><option value="une">une</option></select> rue.</div>
+            <div class="flex flex-wrap items-center gap-x-2">Dans cette rue, il y a <select data-answer="une" class="input-blank"><option value="">...</option><option value="un">un</option><option value="une">une</option></select> maison.</div>
+            <div class="flex flex-wrap items-center gap-x-2">Dans cette maison, il y a <select data-answer="un" class="input-blank"><option value="">...</option><option value="un">un</option><option value="une">une</option></select> escalier.</div>
+            <div class="flex flex-wrap items-center gap-x-2">Dans cet escalier, il y a <select data-answer="une" class="input-blank"><option value="">...</option><option value="un">un</option><option value="une">une</option></select> chambre.</div>
+            <div class="flex flex-wrap items-center gap-x-2">Dans cette chambre, il y a <select data-answer="une" class="input-blank"><option value="">...</option><option value="un">un</option><option value="une">une</option></select> table.</div>
+            <div class="flex flex-wrap items-center gap-x-2">Sur cette table, il y a <select data-answer="un" class="input-blank"><option value="">...</option><option value="un">un</option><option value="une">une</option></select> tapis.</div>
+            <div class="flex flex-wrap items-center gap-x-2">Sur ce tapis, il y a <select data-answer="une" class="input-blank"><option value="">...</option><option value="un">un</option><option value="une">une</option></select> cage.</div>
+            <div class="flex flex-wrap items-center gap-x-2">Dans cette cage, il y a <select data-answer="un" class="input-blank"><option value="">...</option><option value="un">un</option><option value="une">une</option></select> nid.</div>
+            <div class="flex flex-wrap items-center gap-x-2">Dans ce nid, il y a <select data-answer="un" class="input-blank"><option value="">...</option><option value="un">un</option><option value="une">une</option></select> œuf.</div>
+            <div class="flex flex-wrap items-center gap-x-2">Dans cet œuf, il y a <select data-answer="un" class="input-blank"><option value="">...</option><option value="un">un</option><option value="une">une</option></select> oiseau.</div>
+        </div>
+
+        <div id="result-message" class="hidden mb-6 p-4 rounded-lg text-center font-semibold"></div>
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <button onclick="checkAnswers()" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-full font-bold transition-all transform hover:scale-105 shadow-md">
+                Vérifier mes réponses
+            </button>
+            <button onclick="resetGame()" class="bg-gray-100 hover:bg-gray-200 text-gray-600 px-8 py-3 rounded-full font-bold transition-all">
+                Recommencer
+            </button>
+        </div>
+
+        <footer class="mt-12 text-center text-sm text-gray-400">
+            <p>Paul Éluard (1895-1952)</p>
+        </footer>
+    </div>
+
+    <script>
+        function checkAnswers() {
+            const selects = document.querySelectorAll('.input-blank');
+            const messageDiv = document.getElementById('result-message');
+            let correctCount = 0;
+            let totalAnswered = 0;
+
+            selects.forEach(select => {
+                const userAnswer = select.value;
+                const correctAnswer = select.getAttribute('data-answer');
+
+                if (userAnswer === "") {
+                    select.classList.remove('correct', 'incorrect');
+                } else {
+                    totalAnswered++;
+                    if (userAnswer === correctAnswer) {
+                        select.classList.remove('incorrect');
+                        select.classList.add('correct');
+                        correctCount++;
+                    } else {
+                        select.classList.remove('correct');
+                        select.classList.add('incorrect');
+                    }
+                }
+            });
+
+            messageDiv.classList.remove('hidden', 'bg-green-100', 'text-green-700', 'bg-orange-100', 'text-orange-700', 'bg-blue-100', 'text-blue-700', 'bg-red-100', 'text-red-700');
+
+            if (totalAnswered === 0) {
+                messageDiv.textContent = "Veuillez faire au moins un choix avant de vérifier.";
+                messageDiv.classList.add('bg-blue-100', 'text-blue-700');
+            } else if (correctCount === selects.length) {
+                messageDiv.textContent = "Parfait ! Tout est correct. 🎉";
+                messageDiv.classList.add('bg-green-100', 'text-green-700');
+            } else {
+                messageDiv.textContent = `Vous avez ${correctCount} bonne(s) réponse(s) sur ${selects.length}.`;
+                messageDiv.classList.add('bg-orange-100', 'text-orange-700');
+            }
+        }
+
+        function resetGame() {
+            const selects = document.querySelectorAll('.input-blank');
+            const messageDiv = document.getElementById('result-message');
+            
+            selects.forEach(select => {
+                select.value = '';
+                select.classList.remove('correct', 'incorrect');
+            });
+            
+            messageDiv.classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
